@@ -1,0 +1,156 @@
+{
+  parserClass="org.intellij.sdk.language.parser.SimpleParser"
+
+  extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
+
+  psiClassPrefix="Simple"
+  psiImplClassSuffix="Impl"
+  psiPackage="org.intellij.sdk.language.psi"
+  psiImplPackage="org.intellij.sdk.language.psi.impl"
+
+  elementTypeHolderClass="com.tscript.tscriptplugin2.TScriptElementType"
+  elementTypeClass="com.tscript.tscriptplugin2.TScriptElementType"
+  tokenTypeClass="com.tscript.tscriptplugin2.TScriptTokenType"
+
+  tokens = [
+        IDENTIFIER="regexp:[a-zA-Z]+[a-zA-Z0-9]*"
+        INTEGER="regexp:\d+|0x[0-9a-fA-F]+|0o[0-7]+|0b[01]+"
+        REAL="regexp:(\d+\.\d*)|(\.\d+)"
+        TRUE="true"
+        FALSE="false"
+        STRING="\".*\""
+        NULL="null"
+
+        EOS=";"
+        COLON=":"
+        SEPARATOR=","
+
+        ASSIGN="="
+
+        CURLY_BRACKET_OPEN="{"
+        CURLY_BRACKET_CLOSE="}"
+        PARENTHESIS_OPEN="("
+        PARENTHESIS_CLOSE=")"
+        BRACKET_OPEN="["
+        BRACKET_CLOSE="]"
+        DOT="."
+        PLUS="+"
+        MINUS="-"
+        MUL="*"
+        DIV="/"
+        IDIV="//"
+        MOD="%"
+        POW="^"
+        SHIFT_L="<<"
+        SHIFT_R=">>"
+
+        EQUALS="=="
+        NOT_EQUALS="!="
+        GT=">"
+        LT=">"
+        GEQ=">="
+        LEQ="<="
+
+        AND="and"
+        OR="or"
+        XOR="xor"
+        NOT="not"
+
+        ABSTRACT="abstract"
+        CLASS="class"
+        PUBLIC="public"
+        PRIVATE="private"
+        PROTECTED="protected"
+        STATIC="static"
+        CONSTRUCTOR="constructor"
+        SUPER="super"
+        THIS="this"
+
+        NAMESPACE="namespace"
+
+        OVERRIDDEN="overridden"
+        FUNCTION="function"
+        NATIVE="native"
+
+        VAR="var"
+        CONST="const"
+
+        IF="if"
+        THEN="then"
+        ELSE="else"
+
+        WHILE="while"
+        DO="do"
+        FOR="for"
+        IN="in"
+
+        TRY="try"
+        CATCH="catch"
+        THROW="throw"
+
+        BREAK="break"
+        CONTINUE="continue"
+
+        RETURN="return"
+
+        IMPORT="import"
+        USE="use"
+  ]
+}
+
+simpleFile ::= global_scope* <<eof>>
+global_scope ::= (statement | class | namespace)*
+
+class ::= ABSTRACT? CLASS IDENTIFIER (COLON IDENTIFIER)? CURLY_BRACKET_OPEN class_body? CURLY_BRACKET_CLOSE
+class_body ::= visibility (visibility | STATIC? inner_class_declaration | OVERRIDDEN? function | constructor)*
+visibility ::= (PUBLIC | PRIVATE | PROTECTED) COLON
+constructor ::= CONSTRUCTOR function_param_list (COLON SUPER function_param_list)? block
+inner_class_declaration ::= var_def | const_def | native_function | class
+
+namespace ::= NAMESPACE IDENTIFIER CURLY_BRACKET_OPEN namespace_body CURLY_BRACKET_CLOSE
+namespace_body ::= function | native_function | class | namespace
+
+var_def ::= VAR single_var_def (SEPARATOR single_var_def)* EOS
+single_var_def ::= IDENTIFIER (ASSIGN expression)
+
+const_def ::= CONST single_const_def (SEPARATOR single_const_def)* EOS
+single_const_def ::= (IDENTIFIER ASSIGN expression)+
+
+function ::= FUNCTION IDENTIFIER function_param_list block
+native_function ::= NATIVE FUNCTION IDENTIFIER function_param_list EOS
+function_param_list ::= PARENTHESIS_OPEN (single_var_def (SEPARATOR single_var_def)* )? PARENTHESIS_CLOSE
+
+expression ::= (INTEGER | REAL | TRUE | FALSE | STRING | NULL | array | dictionary | range | IDENTIFIER | lambda | unary_op | THIS | super_access | group) postfix_op*
+expression_list ::= expression (SEPARATOR expression)*
+array ::= BRACKET_OPEN expression_list? BRACKET_CLOSE
+dictionary ::= CURLY_BRACKET_OPEN (dictionary_entry (SEPARATOR dictionary_entry)* )? CURLY_BRACKET_CLOSE
+dictionary_entry ::= expression COLON expression
+range ::= expression COLON expression
+call_arguments ::= PARENTHESIS_OPEN expression_list PARENTHESIS_CLOSE
+array_access ::= BRACKET_OPEN expression BRACKET_CLOSE
+lambda ::= FUNCTION (BRACKET_OPEN closures BRACKET_CLOSE)? function_param_list block
+closures ::= (single_closure (SEPARATOR single_closure)*)?
+single_closure ::= IDENTIFIER (ASSIGN expression)?
+unary_op ::= (NOT | MINUS | PLUS) expression
+super_access ::= SUPER DOT IDENTIFIER
+group ::= PARENTHESIS_OPEN expression PARENTHESIS_CLOSE
+postfix_op ::= call_arguments | array_access | member_access
+member_access ::= DOT IDENTIFIER
+
+statement ::= expression EOS | if_else | block | while_do | do_while | for_loop | try_catch | throw | break | continue | return | EOS | var_def EOS | const_def EOS | import | use | assign_stmt
+block ::= CURLY_BRACKET_OPEN statement* CURLY_BRACKET_CLOSE
+if_else ::= IF expression THEN statement (ELSE statement)?
+while_do ::= WHILE expression DO statement
+do_while ::= DO statement WHILE expression EOS
+for_loop ::= FOR run_var (IN expression)? DO statement
+run_var ::= expression | VAR IDENTIFIER
+try_catch ::= TRY statement CATCH (VAR | CONST) IDENTIFIER DO statement;
+throw ::= THROW expression EOS
+break ::= BREAK EOS
+continue ::= CONTINUE EOS
+return ::= RETURN (expression)? EOS
+import ::= IMPORT IDENTIFIER (DOT IDENTIFIER)* (DOT MUL)* EOS
+use ::= USE expression EOS
+assign_stmt ::= (ASSIGN | PLUS | MINUS | MUL | DIV | IDIV | SHIFT_L | SHIFT_R | MOD | POW) ASSIGN expression
+
+// TODO binary operators
