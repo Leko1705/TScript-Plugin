@@ -1,4 +1,4 @@
-package com.tscript.tscriptplugin2;
+package com.tscript.tscriptplugin;
 
 import com.intellij.lang.Language;
 

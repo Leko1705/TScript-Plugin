@@ -29,7 +29,7 @@
         <!-- fixed with Artur Rausch LOL -->
         <fileType
                 name="TScript File"
-                implementationClass="com.tscript.tscriptplugin2.TScriptFileType"
+                implementationClass="com.tscript.tscriptplugin.TScriptFileType"
                 fieldName="INSTANCE"
                 language="TScript"
                 extensions="tscript"/>

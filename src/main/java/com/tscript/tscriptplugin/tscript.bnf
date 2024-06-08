@@ -8,9 +8,9 @@
   psiPackage="org.intellij.sdk.language.psi"
   psiImplPackage="org.intellij.sdk.language.psi.impl"
 
-  elementTypeHolderClass="com.tscript.tscriptplugin2.TScriptElementType"
-  elementTypeClass="com.tscript.tscriptplugin2.TScriptElementType"
-  tokenTypeClass="com.tscript.tscriptplugin2.TScriptTokenType"
+  elementTypeHolderClass="com.tscript.tscriptplugin.TScriptElementType"
+  elementTypeClass="com.tscript.tscriptplugin.TScriptElementType"
+  tokenTypeClass="com.tscript.tscriptplugin.TScriptTokenType"
 
   tokens = [
         IDENTIFIER="regexp:[a-zA-Z]+[a-zA-Z0-9]*"
